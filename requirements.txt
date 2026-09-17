@@ -1,7 +1,20 @@
-fastapi
-uvicorn[standard]
-python-dotenv
-python-multipart
-pymupdf
 alembic
-sqlalchemy psycopg2-binary
+bcrypt
+chromadb
+email-validator
+fastapi
+groq
+langchain-text-splitters
+numpy
+psycopg2-binary
+pymupdf
+python-dotenv
+python-jose[cryptography]
+python-multipart
+rank-bm25
+scikit-learn
+sentence-transformers
+sqlalchemy
+tiktoken
+umap-learn
+uvicorn[standard]

@@ -4,8 +4,9 @@ from backend.app.services.pdf_service import extract_text
 import time, uuid
 from pathlib import Path
 import shutil
+from backend.app.services.vector_store import delete_document_embeddings
 from chromadb.api.types import Metadata
-from .database import engine, Base, get_db
+from .database import get_db
 from . import models
 from .schemas import UserCreate,UserLogin
 from fastapi import Depends
@@ -56,8 +57,6 @@ from backend.app.services.retrieval_service import search_chunks
 from backend.app.services.llmservice import generate_answer
 from backend.app.services.context_service import build_context
 
-
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="RAGViz API")
 
@@ -151,15 +150,14 @@ def get_documents(
 # DELETE /documents/{filename}
 # -------------------------
 
-@app.delete("/documents/{filename}")
+@app.delete("/documents/{document_id}")
 def delete_document(
-    filename: str,
+    document_id: int,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    # 1. Find the document belonging to the logged-in user
     document = db.query(models.Document).filter(
-        models.Document.filename == filename,
+        models.Document.id == document_id,
         models.Document.user_id == current_user.id
     ).first()
 
@@ -169,20 +167,26 @@ def delete_document(
             detail="Document not found"
         )
 
-    # 2. Get the actual file path
-    file_path = Path(document.file_path) #type:ignore
+    # Delete embeddings from ChromaDB
+    deleted_embeddings = delete_document_embeddings(
+        document_id
+    )
 
-    # 3. Delete the physical PDF
+    # Delete the physical PDF
+    file_path = Path(document.file_path)  # type: ignore
+
     if file_path.exists():
         file_path.unlink()
 
-    # 4. Delete the database record
+    # Delete PostgreSQL document
+    # Its chunks are deleted through the relationship cascade
     db.delete(document)
     db.commit()
 
     return {
         "message": "Document deleted successfully",
-        "filename": filename
+        "document_id": document_id,
+        "deleted_embeddings": deleted_embeddings
     }
 
 @app.post("/documents/{filename}/extract")
@@ -420,7 +424,6 @@ def login_user(
     }
 
 @app.post("/documents/{filename}/chunks")
-@app.post("/documents/{filename}/chunks")
 def create_chunks(
     filename: str,
     strategy: str = "recursive",
@@ -563,8 +566,6 @@ def create_chunks(
             for chunk in chunk_records
         ]
     }
-@app.post("/documents/{filename}/embeddings")
-
 @app.post("/documents/{filename}/embeddings")
 def create_embeddings(
     filename: str,
@@ -2840,7 +2841,7 @@ def document_visualization(
         "document_id": document_id,
         "filename": document.filename,
         "model_name": model_name,
-        "dimensions": 3,
+        "dimensions": dimensions,
         "points": points
     }
 
@@ -3119,6 +3120,7 @@ def advanced_search(
 def retrieval_comparison(
     document_id: int,
     query: str,
+    relevant_chunks: list[int],
     top_k: int = 3,
     candidate_k: int = 10,
     current_user: models.User = Depends(get_current_user),
@@ -3143,8 +3145,9 @@ def retrieval_comparison(
     results = evaluate_retrieval_strategies(
         query=query,
         document_id=document_id,
+        relevant_chunks=set(relevant_chunks),
         top_k=top_k,
-        candidate_k=candidate_k
+        candidate_k=candidate_k,
     )
 
     return {
@@ -3312,3 +3315,10 @@ def rebuild_minilm_collection(
         "document_id": document_id,
         "chunks_stored": len(chunks)
     }
+
+
+def main() -> None:
+    """Run the API with the installed ``ragviz`` command."""
+    import uvicorn
+
+    uvicorn.run(app, host="127.0.0.1", port=8000)

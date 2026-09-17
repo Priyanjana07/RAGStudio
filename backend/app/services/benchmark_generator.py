@@ -1,6 +1,6 @@
 import json
 
-from backend.app.services.llmservice import client
+from backend.app.services.llmservice import get_client
 
 
 def generate_benchmark_questions(
@@ -67,7 +67,7 @@ DOCUMENT CHUNKS:
 {chunk_text}
 """
 
-    response = client.chat.completions.create(
+    response = get_client().chat.completions.create(
         model="openai/gpt-oss-20b",
         messages=[
             {

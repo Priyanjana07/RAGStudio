@@ -50,3 +50,45 @@ def store_chunks(
 
 def get_experiment_collection(name: str):
     return client.get_or_create_collection(name=name)
+
+def delete_document_embeddings(document_id: int):
+    deleted_count = 0
+
+    # 1. Delete from the generic collection
+    results = collection.get(
+        where={
+            "document_id": document_id
+        }
+    )
+
+    ids = results.get("ids", [])
+
+    if ids:
+        collection.delete(ids=ids)
+        deleted_count += len(ids)
+
+    # 2. Delete from all model-specific collections
+    model_names = [
+        "minilm",
+        "mpnet",
+        "distilroberta",
+    ]
+
+    for model_name in model_names:
+        model_collection = get_embedding_collection(
+            model_name
+        )
+
+        results = model_collection.get(
+            where={
+                "document_id": document_id
+            }
+        )
+
+        ids = results.get("ids", [])
+
+        if ids:
+            model_collection.delete(ids=ids)
+            deleted_count += len(ids)
+
+    return deleted_count

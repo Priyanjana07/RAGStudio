@@ -31,25 +31,7 @@
     margin: 0 auto;
 }
 
-.viz-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
 
-    padding: 7px 12px;
-
-    border-radius: 999px;
-
-    background: #efecff;
-    border: 1px solid #ddd6ff;
-
-    color: #6757d7;
-
-    font-size: 10px;
-    font-weight: 800;
-
-    letter-spacing: 0.14em;
-}
 
 .viz-hero h1 {
     max-width: 820px;

@@ -1,16 +1,8 @@
-from groq import Groq
 from dotenv import load_dotenv
-import os
 import json
 import re
 
-load_dotenv()
-
-client = Groq(
-    api_key=os.getenv("GROQ_API_KEY")
-)
-
-import re
+from backend.app.services.llmservice import get_client
 
 
 def calculate_answer_overlap(
@@ -150,7 +142,7 @@ Use exactly this format:
 }}
 """
 
-    response = client.chat.completions.create(
+    response = get_client().chat.completions.create(
         model="openai/gpt-oss-20b",
         messages=[
             {
@@ -161,7 +153,7 @@ Use exactly this format:
         temperature=0
     )
 
-    content = response.choices[0].message.content.strip()
+    content = (response.choices[0].message.content or "").strip()
 
     try:
 

@@ -1,21 +1,57 @@
 [project]
 name = "ragviz"
 version = "0.1.0"
-description = "Add your description here"
+description = "RAG pipeline visualization API and frontend"
 readme = "README.md"
 authors = [
     { name = "Priyanjana Roy Chowdhury", email = "priyanjanaroychowdhury05@gmail.com" }
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "alembic>=1.17.0",
+    "bcrypt>=4.3.0",
+    "chromadb>=1.5.0",
+    "email-validator>=2.2.0",
     "fastapi>=0.141.1",
+    "groq>=1.0.0",
+    "langchain-text-splitters>=1.1.0",
+    "numpy>=2.3.0",
+    "psycopg2-binary>=2.9.10",
+    "pymupdf>=1.26.0",
+    "python-dotenv>=1.1.0",
+    "python-jose[cryptography]>=3.5.0",
     "python-multipart>=0.0.32",
-    "uvicorn>=0.52.3",
+    "rank-bm25>=0.2.2",
+    "scikit-learn>=1.7.0",
+    "sentence-transformers>=5.1.0",
+    "sqlalchemy>=2.0.40",
+    "tiktoken>=0.11.0",
+    "umap-learn>=0.5.9",
+    "uvicorn[standard]>=0.52.3",
 ]
 
 [project.scripts]
-ragviz = "ragviz:main"
+ragviz = "backend.app.main:main"
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.400",
+    "pytest>=8.4.0",
+]
 
 [build-system]
 requires = ["uv_build>=0.12.2,<0.13.0"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "backend"
+module-root = ""
+
+[tool.pyright]
+include = ["backend", "test_*.py", "groq_test.py"]
+exclude = [".venv", ".venv-1", "frontend", "chroma_db", "uploads"]
+extraPaths = ["."]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.13"
+typeCheckingMode = "basic"

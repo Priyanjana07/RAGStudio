@@ -6,6 +6,8 @@ import PDFProcessing from "./pages/PDFProcessing";
 import ChunkVisualization from "./pages/ChunkVisualization";
 import Home from "./pages/Home";
 import Visualization from "./pages/Visualization";
+import StoredDocuments from "./pages/StoredDocuments";
+import Experiment from "./pages/Experiment";
 
 function App() {
     const [loggedIn, setLoggedIn] = useState(
@@ -14,10 +16,12 @@ function App() {
 
     const [page, setPage] = useState<
         | "home"
+        | "stored"
         | "upload"
         | "processing"
         | "chunks"
         | "visualization"
+        | "experiment"
     >("home");
 
     if (!loggedIn) {
@@ -182,6 +186,31 @@ function App() {
                     Chunks
                 </button>
 
+                {/* EXPERIMENT */}
+
+                <button
+                    onClick={() =>
+                        setPage("experiment")
+                    }
+                    style={{
+                        padding: "9px 14px",
+                        borderRadius: "9px",
+                        border: "1px solid #e1dce8",
+                        background:
+                            page === "experiment"
+                                ? "#f1eeff"
+                                : "#ffffff",
+                        color:
+                            page === "experiment"
+                                ? "#6758d8"
+                                : "#777181",
+                        cursor: "pointer",
+                        fontWeight: 600,
+                    }}
+                >
+                    Experiment
+                </button>
+
                 {/* LOGOUT */}
 
                 <button
@@ -212,20 +241,31 @@ function App() {
             {page === "home" && (
                 <Home
                     onNavigate={(nextPage) => {
-                        if (
-                            nextPage === "upload"
-                        ) {
+
+                        if (nextPage === "stored") {
+                            setPage("stored");
+                        }
+
+                        if (nextPage === "upload") {
                             setPage("upload");
                         }
 
-                        if (
-                            nextPage ===
-                            "visualization"
-                        ) {
+                        if (nextPage === "visualization") {
                             setPage("visualization");
                         }
+
+                        if (nextPage === "experiment") {
+                            setPage("experiment");
+                        }
+
                     }}
                 />
+            )}
+
+            {/* STORED DOCUMENTS */}
+
+            {page === "stored" && (
+                <StoredDocuments />
             )}
 
             {/* UPLOAD */}
@@ -250,6 +290,12 @@ function App() {
 
             {page === "visualization" && (
                 <Visualization />
+            )}
+
+            {/* EXPERIMENTATION WORKSPACE */}
+
+            {page === "experiment" && (
+                <Experiment />
             )}
 
         </div>
