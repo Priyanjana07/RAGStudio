@@ -1,4 +1,4 @@
-RAGViz is an interactive Retrieval-Augmented Generation (RAG) visualization and experimentation platform that lets developers see what is happening inside a RAG pipeline instead of treating it as a black box.
+RAGStudio is an interactive Retrieval-Augmented Generation (RAG) visualization and experimentation platform that lets developers see what is happening inside a RAG pipeline instead of treating it as a black box.
 
 Upload a document, experiment with different chunking and retrieval strategies, visualize embeddings, inspect retrieved evidence, debug failures, and evaluate the quality and performance of your RAG pipeline.
 
